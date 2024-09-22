@@ -15,10 +15,11 @@ const port = process.env.PORT || 3000;
 const app = express();
 
 // Enable CORS with the allowed client URL
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    credentials:true,
+const cors = require('cors');
+
+app.use(cors({
+    origin: 'https://iris-ebon.vercel.app', // Ensure this matches exactly
+    credentials: true,
 }));
 
 app.use(express.json())
