@@ -1,18 +1,22 @@
 import express, { text } from "express";
 import cors from "cors";
+import path from "path";
+import url, { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import ImageKit from "imagekit";
 import mongoose from "mongoose";
 import UserChats from "./models/userChats.js";
 import Chat from "./models/chat.js";
 import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
-import userChats from "./models/userChats.js";
 
 // Load environment variables
 dotenv.config();
 
 const port = process.env.PORT || 3000;
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 // Enable CORS with the allowed client URL
 app.use(
@@ -47,11 +51,6 @@ app.get("/api/upload", (req, res) => {
   res.send(result);
 });
 
-// app.get("/api/test", ClerkExpressRequireAuth(),(req,res)=>{
-//   const userId = req.auth.userId;
-//   console.log(userId);
-//   res.send("Success!");
-// });
 
 app.post("/api/chats",
   ClerkExpressRequireAuth(), async (req, res) => {
@@ -164,7 +163,13 @@ app.put("/api/chats/:id", ClerkExpressRequireAuth (), async (req,res)=>{
 
 app.use((err, req, res, next) => {
   console.error(err.stack)
-  res.status(401).send('Unauthenticated!')
+  res.status(401).send('Unauthenticated!');
+});
+
+app.use(express.static(path.join(__dirname,"../client")))
+
+app.get("*",(req,res)=>{
+  res.sendFile(path.join(__dirname,"../client", "index.html"))
 })
 
 // Start the server
